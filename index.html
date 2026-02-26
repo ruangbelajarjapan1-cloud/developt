@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SISMADIG - Dashboard Management</title>
+    <!-- Tailwind CSS untuk desain premium -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
+        .active-tab { color: #2563eb; border-top: 3px solid #2563eb; }
+        .card-shadow { box-shadow: 0 4px 15px -3px rgba(0,0,0,0.07); }
+        /* Animasi Loading */
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Smooth scrolling & hiding scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="max-w-md mx-auto bg-white min-h-screen flex flex-col border-x shadow-2xl relative">
+
+    <!-- ========================================== -->
+    <!-- KONFIGURASI API (GANTI DENGAN URL GAS ANDA)-->
+    <!-- ========================================== -->
+    <script>
+        // Ganti teks di dalam tanda kutip dengan URL hasil Deploy Google Apps Script Anda
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxyegxLqEcfb5NAcvwPwyKKELfZ1sk_F-KxxNZD2fNO4lbrjd0EOPWOZIOMOFLSE28/exec";
+    </script>
+
+    <!-- HEADER -->
+    <header class="p-5 bg-white sticky top-0 z-30 border-b flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900">SISMADIG</h1>
+            <p class="text-[10px] text-blue-600 font-bold tracking-widest uppercase">Japan-Indo Connection</p>
+        </div>
+        <div id="global-loader" class="hidden"><div class="loader"></div></div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-5 pb-28 overflow-y-auto no-scrollbar">
+        
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="space-y-6">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-blue-600 p-4 rounded-3xl text-white shadow-lg shadow-blue-200">
+                    <p class="text-[10px] opacity-80 uppercase font-bold">Total Santri</p>
+                    <h3 id="stat-total" class="text-2xl font-bold mt-1">--</h3>
+                </div>
+                <div class="bg-emerald-500 p-4 rounded-3xl text-white shadow-lg shadow-emerald-200">
+                    <p class="text-[10px] opacity-80 uppercase font-bold">Hadir Hari Ini</p>
+                    <h3 class="text-2xl font-bold mt-1">--</h3>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-5 rounded-3xl text-white flex justify-between items-center card-shadow">
+                <div>
+                    <p class="text-[10px] opacity-60 uppercase font-bold">Arus Kas Lembaga</p>
+                    <h3 class="text-xl font-bold text-blue-400 mt-1">Rp 4.250.000</h3>
+                </div>
+                <button onclick="showNotice()" class="bg-white/10 p-3 rounded-full active:scale-90 transition-transform"><i class="fa-solid fa-chart-pie text-blue-400"></i></button>
+            </div>
+
+            <h4 class="font-bold text-slate-800 mt-8 mb-2">Menu Utama</h4>
+            <div class="grid grid-cols-1 gap-3">
+                <button onclick="switchTab('absensi')" class="flex items-center p-4 bg-white border rounded-2xl hover:bg-slate-50 active:scale-95 transition-all card-shadow w-full">
+                    <div class="h-12 w-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fa-solid fa-calendar-day text-lg"></i>
+                    </div>
+                    <div class="text-left flex-1">
+                        <p class="font-bold text-sm text-slate-800">Absensi Santri</p>
+                        <p class="text-[10px] text-slate-400">Input kehadiran harian otomatis</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                </button>
+                <button onclick="showNotice()" class="flex items-center p-4 bg-white border rounded-2xl hover:bg-slate-50 active:scale-95 transition-all card-shadow w-full">
+                    <div class="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fa-solid fa-book-quran text-lg"></i>
+                    </div>
+                    <div class="text-left flex-1">
+                        <p class="font-bold text-sm text-slate-800">Progres Tahfidz</p>
+                        <p class="text-[10px] text-slate-400">Catat setoran hafalan terbaru</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW: ABSENSI -->
+        <div id="view-absensi" class="hidden space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-800">Presensi Santri</h2>
+                <button onclick="loadSantri()" class="text-blue-600 text-xs font-bold active:scale-90 transition-transform"><i class="fa-solid fa-sync mr-1"></i> Refresh</button>
+            </div>
+            
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-4 top-4 text-slate-300"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama santri..." class="w-full p-3.5 pl-12 bg-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+            
+            <div id="santri-container" class="space-y-3 mt-4">
+                <!-- Data akan dimuat di sini oleh JavaScript -->
+                <div class="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <i class="fa-solid fa-cloud-arrow-down text-3xl text-slate-300 mb-3"></i>
+                    <p class="text-slate-500 text-sm font-medium">Menghubungkan ke server...</p>
+                    <p class="text-slate-400 text-xs mt-1">Mengambil data dari Google Sheets</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- NOTIFICATION BOX (TOAST) -->
+    <div id="msg-box" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden transition-opacity duration-300 w-[90%] max-w-sm">
+        <div class="bg-slate-800 text-white px-5 py-3.5 rounded-2xl text-sm font-bold shadow-2xl flex items-center justify-between">
+            <div class="flex items-center">
+                <i id="msg-icon" class="fa-solid fa-circle-check text-emerald-400 mr-3 text-lg"></i>
+                <span id="msg-text">Pesan berhasil dikirim</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION BOTTOM -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-white/90 backdrop-blur-md border-t flex justify-around shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-40 pb-safe">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center py-4 px-6 active-tab w-1/3">
+            <i class="fa-solid fa-house-chimney text-lg mb-1"></i>
+            <span class="text-[9px] font-bold uppercase tracking-wider">Home</span>
+        </button>
+        <button onclick="switchTab('absensi')" id="nav-absensi" class="flex flex-col items-center py-4 px-6 text-slate-400 w-1/3">
+            <i class="fa-solid fa-calendar-check text-lg mb-1"></i>
+            <span class="text-[9px] font-bold uppercase tracking-wider">Absen</span>
+        </button>
+        <button onclick="showNotice()" class="flex flex-col items-center py-4 px-6 text-slate-400 w-1/3">
+            <i class="fa-solid fa-wallet text-lg mb-1"></i>
+            <span class="text-[9px] font-bold uppercase tracking-wider">Kas</span>
+        </button>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- SCRIPT LOGIC (PENGHUBUNG KE GOOGLE SHEETS) -->
+    <!-- ========================================== -->
+    <script>
+        let allSantri = [];
+
+        // 1. Fungsi Pindah Halaman (Tab)
+        function switchTab(tabId) {
+            // Sembunyikan semua view
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-absensi').classList.add('hidden');
+            
+            // Reset style navigasi
+            document.getElementById('nav-dashboard').classList.replace('active-tab', 'text-slate-400');
+            document.getElementById('nav-absensi').classList.replace('active-tab', 'text-slate-400');
+
+            // Tampilkan view yang dipilih
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-' + tabId).classList.replace('text-slate-400', 'active-tab');
+
+            // Jika buka tab absensi dan data masih kosong, ambil data dari API
+            if(tabId === 'absensi' && allSantri.length === 0) {
+                loadSantri();
+            }
+        }
+
+        // 2. Mengambil Data Santri dari Google Apps Script (GET)
+        async function loadSantri() {
+            const container = document.getElementById('santri-container');
+            const loader = document.getElementById('global-loader');
+            
+            // Pengecekan apakah URL sudah diisi
+            if (!WEB_APP_URL || WEB_APP_URL.includes("MASUKKAN_URL")) {
+                container.innerHTML = `
+                    <div class="p-6 bg-red-50 rounded-2xl border border-red-200 text-center">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl mb-2"></i>
+                        <p class="text-red-700 text-sm font-bold mb-1">URL API Belum Diatur!</p>
+                        <p class="text-red-500 text-xs">Silakan edit file index.html baris ke-30 dan masukkan URL Web App dari Google Apps Script Anda.</p>
+                    </div>`;
+                return;
+            }
+            
+            loader.classList.remove('hidden');
+            try {
+                // Proses Fetch Data
+                const response = await fetch(`${WEB_APP_URL}?action=getSantri`);
+                allSantri = await response.json();
+                
+                // Tampilkan ke layar
+                renderSantri(allSantri);
+                
+                // Update total di dashboard
+                document.getElementById('stat-total').innerText = allSantri.length;
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                container.innerHTML = `
+                    <div class="p-6 bg-red-50 rounded-2xl border border-red-200 text-center">
+                        <p class="text-red-700 text-sm font-bold mb-1">Koneksi Gagal</p>
+                        <p class="text-red-500 text-xs">Tidak dapat terhubung ke Google Sheets. Pastikan akses Web App diset ke "Anyone".</p>
+                    </div>`;
+            }
+            loader.classList.add('hidden');
+        }
+
+        // 3. Render (Menggambar) Data ke dalam HTML
+        function renderSantri(data) {
+            const container = document.getElementById('santri-container');
+            container.innerHTML = ""; // Bersihkan kontainer
+            
+            if(data.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-400 py-10 text-sm italic">Data tidak ditemukan.</p>`;
+                return;
+            }
+
+            data.forEach(s => {
+                // Lewati baris kosong dari spreadsheet
+                if (!s.Nama) return; 
+                
+                const card = document.createElement('div');
+                card.className = "p-4 bg-white border rounded-2xl flex justify-between items-center card-shadow";
+                card.innerHTML = `
+                    <div class="flex-1 pr-2">
+                        <p class="font-bold text-slate-800 text-sm leading-tight">${s.Nama}</p>
+                        <p class="text-[10px] text-slate-400 mt-1"><i class="fa-solid fa-tag mr-1 opacity-50"></i>${s.Kelas || 'Umum'}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="kirimAbsen('${s.Nama}', 'Hadir')" class="px-4 py-2 bg-emerald-500 text-white text-[10px] font-bold rounded-xl shadow-lg shadow-emerald-100 active:scale-90 transition-transform flex items-center">
+                            HADIR
+                        </button>
+                        <button onclick="kirimAbsen('${s.Nama}', 'Izin')" class="px-4 py-2 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-xl active:scale-90 transition-transform">
+                            IZIN
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 4. Mengirim Data Absen ke Google Sheets (POST)
+        async function kirimAbsen(nama, status) {
+            const loader = document.getElementById('global-loader');
+            loader.classList.remove('hidden');
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Penting untuk menghindari error CORS di GAS
+                    body: JSON.stringify({ 
+                        action: 'submitAbsensi', 
+                        nama: nama, 
+                        status: status 
+                    })
+                });
+                
+                const res = await response.json();
+                
+                if(res.status === 'success') {
+                    showMsg(`Berhasil! ${nama} tercatat ${status}`, 'success');
+                } else {
+                    showMsg("Gagal merespon dari server.", 'error');
+                }
+            } catch (err) {
+                console.error("Error posting data:", err);
+                showMsg("Terjadi kesalahan jaringan. Cek koneksi Anda.", 'error');
+            }
+            loader.classList.add('hidden');
+        }
+
+        // 5. Fitur Pencarian Nama (Search Bar)
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const filteredData = allSantri.filter(s => s.Nama && s.Nama.toLowerCase().includes(keyword));
+            renderSantri(filteredData);
+        });
+
+        // 6. Fungsi Bantuan untuk Notifikasi (Toast)
+        function showMsg(text, type = 'success') {
+            const box = document.getElementById('msg-box');
+            const icon = document.getElementById('msg-icon');
+            
+            document.getElementById('msg-text').innerText = text;
+            
+            if (type === 'success') {
+                icon.className = "fa-solid fa-circle-check text-emerald-400 mr-3 text-lg";
+            } else {
+                icon.className = "fa-solid fa-triangle-exclamation text-red-400 mr-3 text-lg";
+            }
+            
+            box.classList.remove('hidden');
+            
+            // Otomatis hilang setelah 3 detik
+            setTimeout(() => {
+                box.classList.add('hidden');
+            }, 3000);
+        }
+
+        function showNotice() {
+            showMsg("Fitur ini sedang dalam tahap pengembangan tim Jepang.", 'error');
+        }
+    </script>
+</body>
+</html>
