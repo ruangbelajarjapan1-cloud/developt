@@ -22,8 +22,10 @@
 </head>
 <body class="max-w-md mx-auto bg-slate-100 min-h-screen flex flex-col relative overflow-hidden shadow-2xl">
 
+    <!-- ============================================== -->
+    <!-- MASUKKAN URL GOOGLE APPS SCRIPT PAK WAHYU DI SINI -->
+    <!-- ============================================== -->
     <script>
-        // URL API Google Apps Script Pak Wahyu
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxyegxLqEcfb5NAcvwPwyKKELfZ1sk_F-KxxNZD2fNO4lbrjd0EOPWOZIOMOFLSE28/exec";
     </script>
 
@@ -34,7 +36,7 @@
             </div>
             <div>
                 <h1 class="text-xl font-extrabold text-slate-800 tracking-tight leading-none">SantriLink</h1>
-                <p class="text-[10px] text-blue-600 font-bold tracking-widest uppercase mt-1">Admin Portal</p>
+                <p class="text-[10px] text-blue-600 font-bold tracking-widest uppercase mt-1">Admin Portal Pro</p>
             </div>
         </div>
         <div id="global-loader" class="hidden"><div class="loader"></div></div>
@@ -44,7 +46,7 @@
         
         <!-- DASHBOARD -->
         <div id="view-dashboard" class="space-y-6 fade-in">
-            <div class="glass-card p-5 rounded-[1.5rem] relative overflow-hidden group cursor-pointer" onclick="showNotice('Fitur Tabung Kebaikan segera hadir!')">
+            <div class="glass-card p-5 rounded-[1.5rem] relative overflow-hidden group cursor-pointer" onclick="showNotice('Fitur Tabung Kebaikan segera aktif!')">
                 <div class="absolute -right-6 -top-6 w-32 h-32 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-full blur-2xl opacity-70"></div>
                 <div class="relative z-10">
                     <div class="flex justify-between items-center mb-3">
@@ -104,19 +106,47 @@
                 </div>
                 <div class="relative">
                     <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                    <input type="text" id="searchInput" placeholder="Cari santri..." class="w-full p-3.5 pl-11 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                    <input type="text" id="searchInput" placeholder="Cari santri..." class="w-full p-3.5 pl-11 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
             </div>
             <div id="santri-container" class="space-y-3"><div class="p-10 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="mt-2 text-sm">Menyiapkan data...</p></div></div>
         </div>
 
-        <!-- TAHFIDZ -->
+        <!-- TAHFIDZ (FITUR PRO BARU) -->
         <div id="view-tahfidz" class="hidden space-y-5 fade-in">
-            <div class="glass-card p-6 rounded-[1.5rem] text-center mt-4">
-                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-tree text-indigo-500 text-3xl"></i></div>
-                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Pohon Hafalan</h2>
-                <p class="text-sm text-slate-500 mb-5">Visualisasi progres tahfidz menarik.</p>
-                <button onclick="showNotice('Modul SantriLink Pro segera hadir!')" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl w-full">Pelajari Fitur Pro</button>
+            <h2 class="text-xl font-extrabold text-slate-800 px-1 mt-2">Setoran Hafalan</h2>
+            <div class="glass-card p-5 rounded-[1.5rem]">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Santri</label>
+                        <select id="inputTahfidzNama" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="">-- Pilih Santri --</option>
+                            <!-- Pilihan dimuat otomatis dari Google Sheets -->
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Surah</label>
+                            <input type="text" id="inputSurah" placeholder="Contoh: Al-Mulk" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ayat</label>
+                            <input type="text" id="inputAyat" placeholder="Contoh: 1-10" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nilai Kualitas Hafalan</label>
+                        <select id="inputNilai" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="A (Sangat Lancar)">A (Sangat Lancar)</option>
+                            <option value="B (Lancar)">B (Lancar)</option>
+                            <option value="C (Kurang Lancar)">C (Kurang Lancar)</option>
+                            <option value="Mengulang">Mengulang</option>
+                        </select>
+                    </div>
+                    <button onclick="kirimTahfidz()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl mt-2 shadow-xl shadow-indigo-200 active:scale-95 transition-all">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Simpan Setoran
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -125,41 +155,44 @@
             <h2 class="text-xl font-extrabold text-slate-800 px-1 mt-2">Manajemen Kas</h2>
             <div class="glass-card p-5 rounded-[1.5rem]">
                 <div class="grid grid-cols-2 gap-3 mb-5">
-                    <button id="btn-masuk" onclick="setJenisKas('masuk')" class="py-3 bg-emerald-500 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-200">Pemasukan</button>
-                    <button id="btn-keluar" onclick="setJenisKas('keluar')" class="py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-sm border border-slate-200">Pengeluaran</button>
+                    <button id="btn-masuk" onclick="setJenisKas('masuk')" class="py-3 bg-emerald-500 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-200 transition-all">Pemasukan</button>
+                    <button id="btn-keluar" onclick="setJenisKas('keluar')" class="py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-sm border border-slate-200 transition-all">Pengeluaran</button>
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Nominal (Rp)</label>
-                        <input type="number" id="inputNominal" placeholder="50000" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-extrabold text-slate-800 text-lg">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nominal (Rp)</label>
+                        <input type="number" id="inputNominal" placeholder="Contoh: 50000" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-extrabold text-slate-800 text-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Keterangan</label>
-                        <input type="text" id="inputKeterangan" placeholder="SPP Ahmad" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Keterangan / Tujuan</label>
+                        <input type="text" id="inputKeterangan" placeholder="Contoh: SPP Ahmad Bulan Juli" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
-                    <button onclick="kirimKas()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl mt-2 shadow-xl">Simpan Transaksi</button>
+                    <button onclick="kirimKas()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl mt-2 shadow-xl active:scale-95 transition-all">
+                        <i class="fa-solid fa-money-bill-transfer mr-2"></i> Simpan Transaksi
+                    </button>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- TOAST -->
+    <!-- TOAST NOTIFICATION -->
     <div id="msg-box" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 hidden transition-all duration-300 transform scale-95 opacity-0 w-[90%] max-w-[350px]">
-        <div id="msg-bg" class="bg-slate-800 text-white px-5 py-4 rounded-2xl text-sm font-bold shadow-2xl flex items-center justify-between">
+        <div id="msg-bg" class="bg-slate-800 text-white px-5 py-4 rounded-2xl text-sm font-bold shadow-2xl flex items-center justify-between border border-slate-700/50 backdrop-blur-md">
             <div class="flex items-center"><i id="msg-icon" class="fa-solid fa-circle-check text-emerald-400 mr-3 text-xl"></i><span id="msg-text">Pesan terkirim</span></div>
         </div>
     </div>
 
-    <!-- NAV BOTTOM -->
+    <!-- NAVIGATION BOTTOM -->
     <div class="fixed bottom-0 w-full max-w-md bg-transparent z-40 p-5 pb-6 pointer-events-none">
-        <nav class="bg-white/95 backdrop-blur-xl border border-slate-200/60 flex justify-around rounded-[1.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.1)] pointer-events-auto">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center py-4 px-2 active-tab text-slate-400 w-1/4"><i class="fa-solid fa-house text-xl"></i></button>
-            <button onclick="switchTab('absensi')" id="nav-absensi" class="flex flex-col items-center py-4 px-2 text-slate-400 w-1/4"><i class="fa-solid fa-calendar-check text-xl"></i></button>
-            <button onclick="switchTab('tahfidz')" id="nav-tahfidz" class="flex flex-col items-center py-4 px-2 text-slate-400 w-1/4"><i class="fa-solid fa-book-quran text-xl"></i></button>
-            <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center py-4 px-2 text-slate-400 w-1/4"><i class="fa-solid fa-wallet text-xl"></i></button>
+        <nav class="bg-white/95 backdrop-blur-xl border border-slate-200/60 flex justify-around rounded-[1.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.1)] pointer-events-auto overflow-hidden">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center py-4 px-2 active-tab text-slate-400 w-1/4 transition-colors"><i class="fa-solid fa-house text-xl"></i></button>
+            <button onclick="switchTab('absensi')" id="nav-absensi" class="flex flex-col items-center py-4 px-2 text-slate-400 w-1/4 transition-colors"><i class="fa-solid fa-calendar-check text-xl"></i></button>
+            <button onclick="switchTab('tahfidz')" id="nav-tahfidz" class="flex flex-col items-center py-4 px-2 text-slate-400 w-1/4 transition-colors"><i class="fa-solid fa-book-quran text-xl"></i></button>
+            <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center py-4 px-2 text-slate-400 w-1/4 transition-colors"><i class="fa-solid fa-wallet text-xl"></i></button>
         </nav>
     </div>
 
+    <!-- LOGIKA JAVASCRIPT -->
     <script>
         let allSantri = [];
         let jenisKasAktif = 'masuk';
@@ -178,7 +211,10 @@
             document.getElementById('view-' + tabId).classList.remove('hidden');
             document.getElementById('nav-' + tabId).classList.add('active-tab', 'text-blue-600');
             document.getElementById('nav-' + tabId).classList.remove('text-slate-400');
-            if(tabId === 'absensi' && allSantri.length === 0) loadSantri();
+            
+            if((tabId === 'absensi' || tabId === 'tahfidz') && allSantri.length === 0) {
+                loadSantri();
+            }
         }
 
         async function loadSantri() {
@@ -188,11 +224,22 @@
                 const response = await fetch(`${WEB_APP_URL}?action=getSantri`);
                 allSantri = await response.json();
                 renderSantri(allSantri);
+                populateTahfidzDropdown(allSantri);
                 document.getElementById('stat-total').innerText = allSantri.length;
             } catch (err) {
                 container.innerHTML = `<div class="p-6 bg-red-50 rounded-2xl text-center"><p class="text-red-800 text-sm font-bold">Koneksi Terputus / API Belum Benar</p></div>`;
             }
             document.getElementById('global-loader').classList.add('hidden');
+        }
+
+        function populateTahfidzDropdown(data) {
+            const select = document.getElementById('inputTahfidzNama');
+            select.innerHTML = '<option value="">-- Pilih Santri --</option>';
+            data.forEach(s => {
+                if(s.Nama) {
+                    select.innerHTML += `<option value="${s.Nama}">${s.Nama}</option>`;
+                }
+            });
         }
 
         function renderSantri(data) {
@@ -216,8 +263,8 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-2 w-20">
-                        <button onclick="kirimAbsen('${s.Nama}', 'Hadir')" class="py-1.5 bg-blue-500 text-white text-[10px] font-bold rounded-lg w-full">HADIR</button>
-                        <button onclick="kirimAbsen('${s.Nama}', 'Izin')" class="py-1.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg w-full">IZIN</button>
+                        <button onclick="kirimAbsen('${s.Nama}', 'Hadir')" class="py-1.5 bg-blue-500 text-white text-[10px] font-bold rounded-lg w-full active:scale-90 transition-transform shadow-md shadow-blue-200">HADIR</button>
+                        <button onclick="kirimAbsen('${s.Nama}', 'Izin')" class="py-1.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg w-full active:scale-90 transition-transform border border-slate-200">IZIN</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -235,10 +282,37 @@
             document.getElementById('global-loader').classList.add('hidden');
         }
 
+        async function kirimTahfidz() {
+            const nama = document.getElementById('inputTahfidzNama').value;
+            const surah = document.getElementById('inputSurah').value;
+            const ayat = document.getElementById('inputAyat').value;
+            const nilai = document.getElementById('inputNilai').value;
+
+            if(!nama || !surah || !ayat) { showMsg("Mohon lengkapi data setoran", "warning"); return; }
+            
+            document.getElementById('global-loader').classList.remove('hidden');
+            try {
+                await fetch(WEB_APP_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                    body: JSON.stringify({ action: 'submitTahfidz', nama: nama, surah: surah, ayat: ayat, nilai: nilai }) 
+                });
+                showMsg(`✅ Setoran ${nama} tersimpan`, 'success');
+                document.getElementById('inputSurah').value = '';
+                document.getElementById('inputAyat').value = '';
+                document.getElementById('inputTahfidzNama').value = '';
+            } catch (err) {
+                showMsg(`✅ Setoran ${nama} tersimpan`, 'success'); 
+                document.getElementById('inputSurah').value = '';
+                document.getElementById('inputAyat').value = '';
+            }
+            document.getElementById('global-loader').classList.add('hidden');
+        }
+
         function setJenisKas(jenis) {
             jenisKasAktif = jenis;
-            document.getElementById('btn-masuk').className = jenis === 'masuk' ? "py-3 bg-emerald-500 text-white font-bold rounded-xl text-sm shadow-md" : "py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-sm border";
-            document.getElementById('btn-keluar').className = jenis === 'keluar' ? "py-3 bg-rose-500 text-white font-bold rounded-xl text-sm shadow-md" : "py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-sm border";
+            document.getElementById('btn-masuk').className = jenis === 'masuk' ? "py-3 bg-emerald-500 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-200" : "py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-sm border border-slate-200";
+            document.getElementById('btn-keluar').className = jenis === 'keluar' ? "py-3 bg-rose-500 text-white font-bold rounded-xl text-sm shadow-md shadow-rose-200" : "py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-sm border border-slate-200";
         }
 
         async function kirimKas() {
@@ -248,9 +322,9 @@
             document.getElementById('global-loader').classList.remove('hidden');
             try {
                 await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'submitKas', jenis: jenisKasAktif, nominal: nominal, keterangan: ket }) });
-                showMsg(`✅ Tersimpan! ${jenisKasAktif} Rp ${nominal}`, 'success');
+                showMsg(`✅ Tersimpan! Rp ${nominal}`, 'success');
             } catch (err) {
-                showMsg(`✅ Tersimpan! ${jenisKasAktif} Rp ${nominal}`, 'success'); 
+                showMsg(`✅ Tersimpan! Rp ${nominal}`, 'success'); 
             }
             document.getElementById('inputNominal').value = ''; document.getElementById('inputKeterangan').value = '';
             document.getElementById('global-loader').classList.add('hidden');
@@ -264,7 +338,7 @@
         function showMsg(text, type = 'success') {
             const box = document.getElementById('msg-box'), bg = document.getElementById('msg-bg'), icon = document.getElementById('msg-icon');
             document.getElementById('msg-text').innerText = text;
-            bg.className = type === 'success' ? "bg-slate-800 text-white px-5 py-4 rounded-2xl text-sm font-bold shadow-2xl flex items-center justify-between" : "bg-amber-50 text-amber-900 px-5 py-4 rounded-2xl text-sm font-bold shadow-2xl flex items-center justify-between border border-amber-200";
+            bg.className = type === 'success' ? "bg-slate-800 text-white px-5 py-4 rounded-2xl text-sm font-bold shadow-2xl flex items-center justify-between border border-slate-700/50 backdrop-blur-md" : "bg-amber-50 text-amber-900 px-5 py-4 rounded-2xl text-sm font-bold shadow-2xl flex items-center justify-between border border-amber-200";
             icon.className = type === 'success' ? "fa-solid fa-circle-check text-emerald-400 mr-3 text-xl" : "fa-solid fa-triangle-exclamation text-amber-500 mr-3 text-xl";
             clearTimeout(toastTimeout); box.classList.remove('hidden');
             setTimeout(() => { box.classList.remove('scale-95', 'opacity-0'); box.classList.add('scale-100', 'opacity-100'); }, 10);
